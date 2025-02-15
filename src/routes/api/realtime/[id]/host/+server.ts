@@ -35,6 +35,11 @@ export const POST: RequestHandler = async (event) => {
 			ping: 10000,
 			stop() {
 				console.log('Connection stopped.');
+			},
+			headers: {
+				'Cache-Control': 'no-cache',
+				Connection: 'keep-alive',
+				'X-Accel-Buffering': 'no'
 			}
 		}
 	);

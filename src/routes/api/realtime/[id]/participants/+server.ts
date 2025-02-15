@@ -30,23 +30,32 @@ export const POST: RequestHandler = async (event) => {
 
 	console.log(lectureRow.participants?.length);
 
-	return produce(async function start({ emit }) {
-		while (true) {
-			const [lectureRow] = await db
-				.select({ participants: lecture.participants })
-				.from(lecture)
-				.where(eq(lecture.id, event.params.id!))
-				.limit(1);
-			if (!lectureRow) {
-				return;
-			}
+	return produce(
+		async function start({ emit }) {
+			while (true) {
+				const [lectureRow] = await db
+					.select({ participants: lecture.participants })
+					.from(lecture)
+					.where(eq(lecture.id, event.params.id!))
+					.limit(1);
+				if (!lectureRow) {
+					return;
+				}
 
-			const participants = lectureRow.participants?.length || 0;
-			const { error } = emit('message', participants.toString());
-			if (error) {
-				return;
+				const participants = lectureRow.participants?.length || 0;
+				const { error } = emit('message', participants.toString());
+				if (error) {
+					return;
+				}
+				await delay(5000);
 			}
-			await delay(5000);
+		},
+		{
+			headers: {
+				'Cache-Control': 'no-cache',
+				Connection: 'keep-alive',
+				'X-Accel-Buffering': 'no'
+			}
 		}
-	});
+	);
 };

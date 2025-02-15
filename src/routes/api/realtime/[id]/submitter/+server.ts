@@ -45,6 +45,11 @@ export const POST: RequestHandler = async (event) => {
 			stop() {
 				disconnect(event.params.id ?? '', event.locals.user?.id ?? '');
 				console.log('Connection stopped.');
+			},
+			headers: {
+				'Cache-Control': 'no-cache',
+				Connection: 'keep-alive',
+				'X-Accel-Buffering': 'no'
 			}
 		}
 	);
