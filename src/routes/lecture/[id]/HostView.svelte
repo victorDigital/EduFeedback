@@ -114,9 +114,11 @@
 		<div class="flex flex-col items-start gap-0">
 			<Badge>LIVE</Badge>
 			<p>Participants:</p>
-			<div class="number-flow">
-				<NumberFlow value={parseInt($value)} />
-			</div>
+			{#if !isNaN(parseInt($value))}
+				<div class="number-flow">
+					<NumberFlow value={parseInt($value)} />
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}
