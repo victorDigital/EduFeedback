@@ -48,7 +48,8 @@
 		"typescript-eslint": "^8.20.0",
 		"vaul-svelte": "^1.0.0-next.3",
 		"vite": "^6.0.0",
-		"zod": "^3.24.2"
+		"zod": "^3.24.2",
+		"sveltekit-sse": "^0.13.12"
 	},
 	"dependencies": {
 		"@node-rs/argon2": "^2.0.2",
@@ -62,7 +63,6 @@
 		"drizzle-orm": "^0.38.4",
 		"postgres": "^3.4.5",
 		"qrcode": "^1.5.4",
-		"svelte-radix": "^2.0.1",
-		"sveltekit-sse": "^0.13.12"
+		"svelte-radix": "^2.0.1"
 	}
 }
