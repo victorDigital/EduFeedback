@@ -32,6 +32,7 @@ export const POST: RequestHandler = async (event) => {
 
 	return produce(
 		async function start({ emit }) {
+			emit('heartbeat', longString()); // Initial heartbeat to flush the connection
 			while (true) {
 				const [lectureRow] = await db
 					.select({ participants: lecture.participants })
@@ -59,3 +60,11 @@ export const POST: RequestHandler = async (event) => {
 		}
 	);
 };
+
+function longString() {
+	let str = '';
+	for (let i = 0; i < 20000; i++) {
+		str += 'a';
+	}
+	return str;
+}

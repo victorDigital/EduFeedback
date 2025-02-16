@@ -25,6 +25,7 @@ export const POST: RequestHandler = async (event) => {
 
 	return produce(
 		async function start({ emit }) {
+			emit('heartbeat', ''); // Initial heartbeat to flush the connection
 			emit('message', 'hello');
 			while (true) {
 				const { error: statusError } = await sendStatus(emit, event.params.id ?? '');
