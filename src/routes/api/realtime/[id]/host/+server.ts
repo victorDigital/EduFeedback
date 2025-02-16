@@ -30,6 +30,9 @@ export const POST: RequestHandler = async (event) => {
 				const { error: statusError } = await sendScores(emit, event.params.id ?? '');
 				if (statusError) return;
 
+				const { error: annotationError } = await sendAnnotations(emit, event.params.id ?? '');
+				if (annotationError) return;
+
 				await delay(5000);
 			}
 		},
@@ -62,4 +65,27 @@ async function sendScores(
 
 	const scores = row.scores || [];
 	return emit('scores', JSON.stringify(scores));
+}
+
+async function sendAnnotations(
+	emit: (eventName: string, data: string) => Unsafe<void, Error>,
+	id: string
+) {
+	const [row] = await db
+		.select({ annotations: lecture.annotations })
+		.from(lecture)
+		.where(eq(lecture.id, id))
+		.limit(1);
+	if (!row) {
+		return { error: new Error('Lecture not found') };
+	}
+
+	const annotations = row.annotations || [];
+
+	console.log('Annotations:', annotations);
+
+	if (annotations.length === 0) {
+		return emit('annotations', JSON.stringify([]));
+	}
+	return emit('annotations', JSON.stringify(annotations));
 }

@@ -50,6 +50,9 @@ export const lecture = pgTable('lecture', {
 			}>
 		>()
 		.default([]),
+	annotations: jsonb('annotations')
+		.$type<Array<{ at: string; text: string; submitterId: string }>>()
+		.default([]),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	startedAt: timestamp('started_at', { withTimezone: true, mode: 'date' }),
 	endedAt: timestamp('ended_at', { withTimezone: true, mode: 'date' }),
@@ -73,5 +76,11 @@ export type Score = {
 	id: string;
 	value: number;
 	at: string;
+	submitterId: string;
+};
+
+export type Annotation = {
+	at: string;
+	text: string;
 	submitterId: string;
 };

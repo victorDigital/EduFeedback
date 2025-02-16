@@ -6,7 +6,6 @@
 	import NumberFlow from '@number-flow/svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import ScorePlot from './ScorePlot.svelte';

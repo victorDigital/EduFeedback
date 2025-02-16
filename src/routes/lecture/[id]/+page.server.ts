@@ -26,5 +26,9 @@ export const load = (async (event) => {
 		throw redirect(302, '/');
 	}
 
-	return { lecture, isHost: lecture.hostUserId === event.locals.user.id };
+	return {
+		lecture,
+		isHost: lecture.hostUserId === event.locals.user.id,
+		userId: event.locals.user.id
+	};
 }) satisfies PageServerLoad;
