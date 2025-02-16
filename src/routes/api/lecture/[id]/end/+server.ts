@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
-import { lecture } from '$lib/server/db/schema';
+import { lecture, link } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const GET: RequestHandler = async (event) => {
@@ -32,6 +32,8 @@ export const GET: RequestHandler = async (event) => {
 		.update(lecture)
 		.set({ endedAt: new Date(), status: 'done' })
 		.where(eq(lecture.id, event.params.id!));
+
+	await db.delete(link).where(eq(link.lectureId, event.params.id!)); //remove the invitation links
 
 	console.log(`Lecture ${event.params.id} ended by user ${event.locals.user.id}`);
 	return new Response();

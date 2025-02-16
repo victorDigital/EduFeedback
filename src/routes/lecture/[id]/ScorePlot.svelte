@@ -4,6 +4,7 @@
 	let { data }: { data: PageData } = $props();
 	import { VisXYContainer, VisLine, VisAxis, VisScatter, VisStackedBar } from '@unovis/svelte';
 	import type { Score } from '$lib/server/db/schema';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	const connection = source(`/api/realtime/${data.lecture.id}/host`);
 	const scores = connection.select('scores');
@@ -12,7 +13,7 @@
 	type DataRecord = { time: number; value: number };
 	const plotData: DataRecord[] = $derived(format($scores));
 	//lineData is a rolling 10 minute average of the scores ()
-	const lineData: DataRecord[] = $derived(calculateRollingAverage(plotData, 30));
+	const lineData: DataRecord[] = $derived(calculateRollingAverage(plotData, 5));
 
 	function calculateRollingAverage(data: DataRecord[], minutes: number): DataRecord[] {
 		const windowSize = minutes;
@@ -35,10 +36,10 @@
 		if (scores === '') return [];
 		const json: Score[] = JSON.parse(scores);
 		return json.map((score) => ({
-			time: Math.floor(
-				(Number(score.at) - (data.lecture.startedAt ? data.lecture.startedAt.getTime() : 0)) / 60000
-			), //Converted to minutes
-			value: score.value //Score value from -2 to 2
+			time:
+				(Number(score.at) - (data.lecture.startedAt ? data.lecture.startedAt.getTime() : 0)) /
+				60000, // Converted to minutes
+			value: score.value // Score value from -2 to 2
 		}));
 	}
 	const histogramData: DataRecord[] = $derived(calculateHistogram(plotData));
@@ -52,7 +53,29 @@
 		}
 		return histogram;
 	}
+
+	function downloadData() {
+		const data = JSON.stringify(plotData);
+		const blob = new Blob([data], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'scores.json';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
 </script>
+
+{#if $scores !== '' && data.lecture.status === 'done'}
+	<Button
+		class="mb-3 w-fit"
+		onclick={() => {
+			downloadData();
+		}}>Download</Button
+	>
+{/if}
 
 {#key $scores}
 	<VisXYContainer duration={0}>
@@ -66,7 +89,7 @@
 		<VisAxis type="x" label="Minutes since start" />
 		<VisAxis type="y" />
 		<VisLine data={lineData} x={(d) => d.time} y={(d) => d.value} lineWidth={5} />
-		<VisLine data={middleLine} x={(d) => d.time} y={(d) => d.value} lineWidth={2} color="black" />
+		<VisLine data={middleLine} x={(d) => d.time} y={(d) => d.value} lineWidth={2} color="gray" />
 	</VisXYContainer>
 {/key}
 
