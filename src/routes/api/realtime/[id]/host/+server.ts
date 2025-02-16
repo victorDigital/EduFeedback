@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import { lecture, type Score } from '$lib/server/db/schema';
+import { longString } from '$lib/utils';
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { produce, type Unsafe } from 'sveltekit-sse';
@@ -23,7 +24,7 @@ export const POST: RequestHandler = async (event) => {
 
 	return produce(
 		async function start({ emit }) {
-			emit('heartbeat', ''); // Initial heartbeat to flush the connection
+			emit('heartbeat', longString()); // Initial heartbeat to flush the connection
 			emit('message', 'hello');
 			while (true) {
 				const { error: statusError } = await sendScores(emit, event.params.id ?? '');

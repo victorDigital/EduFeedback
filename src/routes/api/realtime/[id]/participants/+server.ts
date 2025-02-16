@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import { lecture } from '$lib/server/db/schema';
+import { longString } from '$lib/utils';
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { produce } from 'sveltekit-sse';
@@ -60,11 +61,3 @@ export const POST: RequestHandler = async (event) => {
 		}
 	);
 };
-
-function longString() {
-	let str = '';
-	for (let i = 0; i < 20000; i++) {
-		str += 'a';
-	}
-	return str;
-}
