@@ -3,7 +3,6 @@
 	import type { PageData } from './$types';
 	import { source } from 'sveltekit-sse';
 	import Feedback from './Feedback.svelte';
-	import ScorePlot from './ScorePlot.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -30,7 +29,4 @@
 {:else if $status === 'done'}
 	<Button href="/" class="my-3">Go Home</Button>
 	<p>The lecture has concluded. Thank you for participating!</p>
-	<div class="mx-auto mt-3 flex flex-col">
-		<ScorePlot {data} />
-	</div>
 {/if}
