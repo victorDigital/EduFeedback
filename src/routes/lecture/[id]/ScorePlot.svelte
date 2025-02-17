@@ -62,7 +62,7 @@
 		const maxTime = Math.max(...times);
 		const range = maxTime - minTime;
 
-		const res = json.map((annotation) => {
+		const res = json.map((annotation, i) => {
 			const annotationTime =
 				(Number(annotation.at) - (data.lecture.startedAt ? data.lecture.startedAt.getTime() : 0)) /
 				60000;
@@ -72,7 +72,7 @@
 					: Math.floor(((annotationTime - minTime) / range) * 100).toString() + '%';
 			return {
 				x: percentage,
-				y: '80%',
+				y: i ? '80%' : '20%',
 				content: annotation.text,
 				subject: {
 					x: percentage,
