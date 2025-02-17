@@ -6,9 +6,11 @@
 	import NumberFlow from '@number-flow/svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import ScorePlot from './ScorePlot.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import ScanQrCode from 'lucide-svelte/icons/scan-qr-code';
 
 	let { data }: { data: PageData } = $props();
 
@@ -65,7 +67,7 @@
 			}}>Begin</Button
 		>
 	{:else if data.lecture.status === 'active'}
-		<div class="flex w-full flex-row flex-wrap justify-end gap-2">
+		<div class="flex w-full flex-row flex-wrap items-center justify-end gap-2">
 			<div class="flex flex-col items-end">
 				<p class="text-sm">Join at tracker.voe.dk</p>
 				<p class="mb-1 text-xs opacity-75">Lecture code:</p>
@@ -79,6 +81,17 @@
 					</InputOTP.Group>
 				{/snippet}
 			</InputOTP.Root>
+			<Dialog.Root>
+				<Dialog.Trigger class={buttonVariants({ variant: 'default', size: 'icon' })}>
+					<ScanQrCode />
+				</Dialog.Trigger>
+				<Dialog.Content class="w-fit">
+					<Dialog.Header>
+						<Dialog.Title>Scan QR Code</Dialog.Title>
+					</Dialog.Header>
+					<InviteQrCode {inviteCode} width={256} />
+				</Dialog.Content>
+			</Dialog.Root>
 		</div>
 	{/if}
 </div>
@@ -123,13 +136,14 @@
 {/if}
 
 {#if data.lecture.status === 'active'}
-	<div class="flex w-full justify-end">
+	<div class="flex w-full justify-end gap-3">
+		<Button variant="default" size="sm" href="/lecture/list">View All</Button>
 		<Button
-			variant="default"
+			variant="destructive"
 			size="sm"
 			onclick={() => {
 				endLecture();
-			}}>End lecture</Button
+			}}>End Lecture</Button
 		>
 	</div>
 	<div class="mx-auto mt-3 flex flex-col">

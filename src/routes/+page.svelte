@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import { ArrowTopRight, Rocket, Pencil2 as Pencil } from 'svelte-radix';
+	import { ArrowTopRight, Rocket, Pencil2 as Pencil, Mix } from 'svelte-radix';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { MediaQuery } from 'svelte/reactivity';
+	import type { PageData } from './$types';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+
+	let { data }: { data: PageData } = $props();
 
 	let createDialogOpen = $state(false);
 	const isDesktop = new MediaQuery('(min-width: 768px)');
@@ -51,6 +55,14 @@
 			>Victor Østergaard <ArrowTopRight class="inline size-[1em]" /></a
 		>
 	</p>
+	{#if data.lectures.count > 0}
+		<Separator />
+		<Button variant="secondary" href="/lecture/list">
+			<Mix />
+			View Created Lectures
+			<Badge variant="outline">{data.lectures.count}</Badge>
+		</Button>
+	{/if}
 </div>
 
 {#if isDesktop.current}

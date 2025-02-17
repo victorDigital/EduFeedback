@@ -66,17 +66,19 @@
 			const annotationTime =
 				(Number(annotation.at) - (data.lecture.startedAt ? data.lecture.startedAt.getTime() : 0)) /
 				60000;
+
+			console.log(annotationTime);
 			const percentage =
 				range === 0
-					? '50%'
+					? '100%'
 					: Math.floor(((annotationTime - minTime) / range) * 100).toString() + '%';
 			return {
 				x: percentage,
-				y: i ? '80%' : '20%',
+				y: i ? '20%' : '10%',
 				content: annotation.text,
 				subject: {
 					x: percentage,
-					y: '50%'
+					y: '100%'
 				},
 				verticalAlign: 'top',
 				cursor: 'pointer',
