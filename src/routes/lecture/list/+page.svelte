@@ -7,6 +7,7 @@
 	import type { PageData } from './$types';
 	import { flip } from 'svelte/animate';
 	import { invalidateAll } from '$app/navigation';
+	import { computeStatus } from '$lib/utils';
 
 	let { data }: { data: PageData } = $props();
 	$inspect(data);
@@ -52,7 +53,7 @@
 			{#if Array.isArray(data.lectures) && data.lectures.length > 0}
 				{#each data.lectures as lecture (lecture.id)}
 					<div animate:flip={{ duration: 300 }}>
-						<Card.Root class={lecture.status == 'active' ? 'border-emerald-500' : 'border-border'}>
+						<Card.Root class={computeStatus(lecture) ? 'border-emerald-500' : 'border-border'}>
 							<Card.Header>
 								<Card.Title>{lecture.eventTitle}</Card.Title>
 								<Card.Description
@@ -60,7 +61,7 @@
 								>
 							</Card.Header>
 							<Card.Content>
-								<Badge>{statusTranslator(lecture.status)}</Badge>
+								<Badge>{statusTranslator(computeStatus(lecture))}</Badge>
 								<Badge>{lecture.createdAt.toLocaleDateString()}</Badge>
 							</Card.Content>
 							<Card.Footer class="flex justify-end gap-2">
@@ -71,7 +72,7 @@
 								<Button
 									onclick={() => deleteLecture(lecture.id)}
 									variant="destructive"
-									disabled={lecture.status == 'active'}
+									disabled={computeStatus(lecture) == 'active'}
 								>
 									Delete
 									<Trash />

@@ -10,8 +10,11 @@
 	import { invalidateAll } from '$app/navigation';
 	import ScorePlot from './ScorePlot.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ScanQrCode from 'lucide-svelte/icons/scan-qr-code';
-
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import { cn } from '$lib/utils';
+	import { dev } from '$app/environment';
 	let { data }: { data: PageData } = $props();
 
 	console.log(data.lecture);
@@ -36,8 +39,14 @@
 
 	const value = source(`/api/realtime/${data.lecture.id}/participants`).select('message');
 
-	async function startLecture() {
-		const res = await fetch(`/api/lecture/${data.lecture.id}/start`);
+	async function startLecture(minutesToEnd?: number) {
+		const res = await fetch(`/api/lecture/${data.lecture.id}/start`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ duration: minutesToEnd ?? 0 })
+		});
 		if (!res.ok) {
 			console.error('Failed to start the lecture:', res.statusText);
 			return;
@@ -55,18 +64,99 @@
 		console.log('Lecture ended successfully.');
 		invalidateAll(); // Ensure the UI is updated after ending the lecture
 	}
+
+	async function abortEndLecture() {
+		const res = await fetch(`/api/lecture/${data.lecture.id}/abort-end`);
+		if (!res.ok) {
+			console.error('Failed to abort the end of the lecture:', res.statusText);
+			return;
+		}
+		console.log('Lecture end aborted successfully.');
+		invalidateAll(); // Ensure the UI is updated after aborting the end of the lecture
+	}
+
+	let timeRemaining = $state('--:--:--');
+	// Update every second
+	const interval = setInterval(() => {
+		if (data.lecture.endedAt) {
+			const endTime = new Date(data.lecture.endedAt).getTime();
+			const now = new Date().getTime();
+			const diff = endTime - now;
+
+			if (diff <= 0) {
+				clearInterval(interval);
+				invalidateAll();
+				timeRemaining = '00:00:00';
+			} else {
+				const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+				const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+				const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+				timeRemaining = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+			}
+		}
+	}, 1000);
 </script>
 
 <div class="my-3 flex w-full justify-end">
 	{#if data.lecture.status === 'not_started'}
 		<Button
 			variant="default"
-			size="lg"
+			class="rounded-r-none"
 			onclick={() => {
 				startLecture();
 			}}>Begin</Button
 		>
-	{:else if data.lecture.status === 'active'}
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger
+				class={cn(buttonVariants({ variant: 'default', size: 'icon' }), 'rounded-l-none')}
+			>
+				<ChevronDown />
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end">
+				<DropdownMenu.Group>
+					<DropdownMenu.GroupHeading>Select Duration</DropdownMenu.GroupHeading>
+					<DropdownMenu.Separator />
+					{#if dev}
+						<DropdownMenu.Item
+							onclick={() => {
+								startLecture(1);
+							}}>1 minute</DropdownMenu.Item
+						>
+					{/if}
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture(30);
+						}}>30 minutes</DropdownMenu.Item
+					>
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture(60);
+						}}>1 hour</DropdownMenu.Item
+					>
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture(120);
+						}}>2 hours</DropdownMenu.Item
+					>
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture(180);
+						}}>3 hours</DropdownMenu.Item
+					>
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture(240);
+						}}>4 hours</DropdownMenu.Item
+					>
+					<DropdownMenu.Item
+						onclick={() => {
+							startLecture();
+						}}>Not specified</DropdownMenu.Item
+					>
+				</DropdownMenu.Group>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	{:else if data.status === 'active'}
 		<div class="flex w-full flex-row flex-wrap items-center justify-end gap-2">
 			<div class="flex flex-col items-end">
 				<p class="text-sm">Join at tracker.voe.dk</p>
@@ -135,23 +225,36 @@
 	</div>
 {/if}
 
-{#if data.lecture.status === 'active'}
+{#if data.status === 'active'}
 	<div class="flex w-full justify-end gap-3">
 		<Button variant="default" size="sm" href="/lecture/list">View All</Button>
-		<Button
-			variant="destructive"
-			size="sm"
-			onclick={() => {
-				endLecture();
-			}}>End Lecture</Button
-		>
+		{#if data.lecture.endedAt}
+			<Button
+				variant="destructive"
+				size="sm"
+				onclick={() => {
+					abortEndLecture();
+				}}>Abort Auto End</Button
+			>
+			<Button variant="outline" size="sm"
+				>Ending In <span class="font-mono">{timeRemaining}</span></Button
+			>
+		{:else}
+			<Button
+				variant="destructive"
+				size="sm"
+				onclick={() => {
+					endLecture();
+				}}>End Lecture</Button
+			>
+		{/if}
 	</div>
 	<div class="mx-auto mt-3 flex flex-col">
 		<ScorePlot {data} />
 	</div>
 {/if}
 
-{#if data.lecture.status === 'done'}
+{#if data.status === 'done'}
 	<Button href="/">Go Home</Button>
 	<div class="mx-auto mt-3 flex flex-col">
 		<p class="text-lg font-semibold">The lecture has ended.</p>

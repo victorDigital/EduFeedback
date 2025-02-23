@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { lecture, type Score } from '$lib/server/db/schema';
-import { longString } from '$lib/utils';
+import { computeStatus, longString } from '$lib/utils';
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { produce, type Unsafe } from 'sveltekit-sse';
@@ -96,14 +96,10 @@ async function sendStatus(
 	emit: (eventName: string, data: string) => Unsafe<void, Error>,
 	id: string
 ) {
-	const [row] = await db
-		.select({ status: lecture.status })
-		.from(lecture)
-		.where(eq(lecture.id, id))
-		.limit(1);
+	const [row] = await db.select().from(lecture).where(eq(lecture.id, id)).limit(1);
 	if (!row) throw new Error('Lecture not found');
 	if (!row.status) return error(500, 'Lecture status not found');
-	const statusMessage = row.status;
+	const statusMessage = computeStatus(row);
 	return emit('status', statusMessage);
 }
 

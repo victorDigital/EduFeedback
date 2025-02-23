@@ -57,10 +57,7 @@ export const lecture = pgTable('lecture', {
 	startedAt: timestamp('started_at', { withTimezone: true, mode: 'date' }),
 	endedAt: timestamp('ended_at', { withTimezone: true, mode: 'date' }),
 	eventTitle: text('event_title').notNull(),
-	status: text('status')
-		.notNull()
-		.$type<'not_started' | 'active' | 'done'>()
-		.default('not_started'),
+	status: text('status').notNull().$type<'not_started' | 'started'>().default('not_started'),
 	participants: jsonb('participants').$type<Array<string>>().default([])
 });
 

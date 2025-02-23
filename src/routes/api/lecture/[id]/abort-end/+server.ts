@@ -30,11 +30,11 @@ export const GET: RequestHandler = async (event) => {
 	//start the lecture
 	await db
 		.update(lecture)
-		.set({ endedAt: new Date(), status: 'started' })
+		.set({ endedAt: null, status: 'started' })
 		.where(eq(lecture.id, event.params.id!));
 
 	await db.delete(link).where(eq(link.lectureId, event.params.id!)); //remove the invitation links
 
-	console.log(`Lecture ${event.params.id} ended by user ${event.locals.user.id}`);
+	console.log(`Lecture ${event.params.id} scheduled end aborted by user ${event.locals.user.id}`);
 	return new Response();
 };
