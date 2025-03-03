@@ -157,7 +157,7 @@
 	}
 </script>
 
-{#if data.lecture.status === 'done'}
+{#if data.status === 'done'}
 	<Button
 		class="mb-3 w-fit"
 		onclick={() => {
@@ -167,7 +167,7 @@
 {/if}
 
 <div class="mb-40 flex flex-col gap-4">
-	{#if data.lecture.status !== 'done'}
+	{#if data.status !== 'done'}
 		<div class="flex w-full flex-col gap-4 *:w-full md:flex-row">
 			<Card.Root>
 				<Card.Header>
@@ -305,7 +305,7 @@
 			</Card.Content>
 		</Card.Root>
 
-		{#if data.lecture.status !== 'done'}
+		{#if data.status !== 'done'}
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>Histogram of last 5min</Card.Title>
