@@ -8,6 +8,8 @@
 
 	let blockSubmission = $state(false);
 
+	let message = $state('');
+
 	let timestampText = $state('');
 
 	async function handleSubmit(event: Event) {
@@ -25,11 +27,20 @@
 				console.error('Failed to submit annotation:', res.statusText);
 				return;
 			}
+			message = 'Timestamp submitted successfully.';
+			await new Promise((resolve) => setTimeout(resolve, 3000));
+			timestampText = '';
+			message = '';
 			blockSubmission = false;
-			console.log('Annotation submitted successfully.');
+			console.log('Timestamp submitted successfully.');
 		} catch (error) {
+			message = 'Failed to submit Timestamp.';
+			await new Promise((resolve) => setTimeout(resolve, 3000));
+			message = '';
 			blockSubmission = false;
 			console.error('Failed to submit annotation:', error);
+		} finally {
+			blockSubmission = false;
 		}
 	}
 </script>
@@ -54,4 +65,5 @@
 			>
 		</div>
 	</div>
+	<p>{message}</p>
 </form>
